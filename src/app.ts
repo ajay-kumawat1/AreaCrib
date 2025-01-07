@@ -1,7 +1,9 @@
 import express, { Application, Request, Response } from "express";
-const app: Application = express();
+import connectDB from "./config/database";
 
-const PORT: number = 3000;
+const app: Application = express();
+const PORT = process.env.PORT ?? 8001;
+connectDB();
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Hello World!");
