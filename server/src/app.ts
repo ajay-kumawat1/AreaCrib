@@ -1,8 +1,9 @@
 import express, { Application, Request, Response } from "express";
 import connectDB from "./config/database";
+import config from "./config/config";
 
 const app: Application = express();
-const PORT = process.env.PORT ?? 8001;
+const PORT = config.server.port ?? 8001;
 connectDB();
 
 app.get("/", (_req: Request, res: Response) => {

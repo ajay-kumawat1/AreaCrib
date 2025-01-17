@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "dotenv-parse-variables": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/dotenv-parse-variables": "^2.0.3"
+  }
+}
