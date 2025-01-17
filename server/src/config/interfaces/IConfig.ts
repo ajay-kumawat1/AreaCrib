@@ -1,5 +1,3 @@
-export type LogLevel = 'emerg' | 'alert' | 'crit' | 'error' | 'warning' | 'notice' | 'info' | 'debug';
-
 export interface IConfig {
     env: string;
     mongo: {
@@ -16,13 +14,5 @@ export interface IConfig {
         root: string;
         port: number;
         host: string;
-        logLevel: LogLevel;
-        axiosTimeout: number;
-        memoryUsageTimeOut: number;
-    };
-    caching: {
-        local: {
-            ttl: number;
-        };
     };
 }

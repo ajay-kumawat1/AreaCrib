@@ -2,7 +2,7 @@ import path from 'path';
 
 import { config as dotenvConfig } from 'dotenv';
 import dotenvParseVariables from 'dotenv-parse-variables';
-import { IConfig, LogLevel } from './interfaces/IConfig';
+import { IConfig } from './interfaces/IConfig';
 
 dotenvConfig({ path: '.env' });
 
@@ -30,14 +30,6 @@ const config: IConfig = {
         root: ROOT,
         port: parsedEnv.PORT as number,
         host: parsedEnv.HOST as string,
-        logLevel: parsedEnv.LOG_LEVEL as LogLevel,
-        axiosTimeout: (parsedEnv.AXIOS_TIMEOUT as number) || 2400000,
-        memoryUsageTimeOut: (parsedEnv.MEMORY_USAGE_TIMEOUT as number) || 300000,
-    },
-    caching: {
-        local: {
-            ttl: parsedEnv.LOCAL_CACHE_TTL as number,
-        },
     },
 };
 
