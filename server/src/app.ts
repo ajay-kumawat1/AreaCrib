@@ -1,7 +1,8 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, json, urlencoded, Request, Response } from "express";
 import connectDB from "./config/database";
 import config from "./config/config";
 import cors from "cors";
+import { IndexRoute } from "./routes/index";
 
 const app: Application = express();
 const PORT = config.server.port ?? 5000;
@@ -14,9 +15,14 @@ app.use(
   })
 );
 
+app.use(json({ limit: "50mb" }));
+app.use(urlencoded({ limit: "50mb", extended: true }));
+
 app.get("/", (_req: Request, res: Response) => {
-  res.send("Hello World!");
+  res.send("Server is running");
 });
+
+app.use('/', new IndexRoute(app).router);
 
 app.listen(PORT, (err?: Error) => {
   err
