@@ -2,7 +2,7 @@ import path from 'path';
 
 import { config as dotenvConfig } from 'dotenv';
 import dotenvParseVariables from 'dotenv-parse-variables';
-import { IConfig } from './interfaces/IConfig';
+import { IConfig } from '../common/interfaces/IConfig';
 
 dotenvConfig({ path: '.env' });
 
