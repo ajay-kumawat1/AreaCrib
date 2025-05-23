@@ -14,7 +14,6 @@ export class IndexRoute implements IRoutes {
         this.initializeRoutes(app);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private initializeRoutes(app: Application): void {
         this.routerArray.push(new UserRoutes(app));
 

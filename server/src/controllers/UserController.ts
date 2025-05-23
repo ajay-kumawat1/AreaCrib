@@ -10,4 +10,14 @@ export default class UserController {
             next(error);
         }
     }
+
+    public static async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { name, email } = req.body;
+            
+        } catch (error) {
+            console.error(`UserController.create() -> Error: ${error}`);
+            next(error);
+        }
+    }
 }
