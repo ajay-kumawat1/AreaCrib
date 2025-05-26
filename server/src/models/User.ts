@@ -3,14 +3,13 @@ import { Document, Schema, model } from 'mongoose';
 import { UserRole } from '../common/enum/Role';
 
 export interface IUser {
-    username: string;
-    role: string;
-    password: string;
+    firstName: string;
+    lastName: string;
     email: string;
+    password: string;
     mobileNumber: string;
-    avatar: string;
-    resetToken: string;
-    expireToken: Date;
+    avatar?: string;
+    role: string;
     creationDate: Date;
     isDeleted: boolean;
 }
@@ -23,14 +22,13 @@ export type NewCreatedUserDoc = Omit<IUser, 'created'>;
 
 const UserSchema = new Schema<IUserDoc>(
     {
-        username: { type: String, unique: true, required: true },
-        role: { type: String, enum: Object.values(UserRole), required: true },
-        password: { type: String, required: true },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
         email: { type: String, required: true, unique: true },
+        password: { type: String, required: true },
         mobileNumber: { type: String },
         avatar: { type: String },
-        resetToken: { type: String },
-        expireToken: { type: Date },
+        role: { type: String, enum: Object.values(UserRole), required: true },
         creationDate: { type: Date, default: Date.now },
         isDeleted: { type: Boolean, default: false },
     },
