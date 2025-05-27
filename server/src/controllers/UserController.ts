@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 
 export default class UserController {
-    public static async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public static async create(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { firstName, lastName, email, password, avatar, role } = req.body;
 
@@ -24,17 +24,17 @@ export default class UserController {
             res.status(201).json(createdUser);
             
         } catch (error) {
-            console.error(`UserController.getAll() -> Error: ${error}`);
+            console.error(`UserController.create() -> Error: ${error}`);
             next(error);
         }
     }
 
-    public static async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public static async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { name, email } = req.body;
+            console.log("UserController.getAll() -> Fetching all users");
             
         } catch (error) {
-            console.error(`UserController.create() -> Error: ${error}`);
+            console.error(`UserController.getAll() -> Error: ${error}`);
             next(error);
         }
     }
