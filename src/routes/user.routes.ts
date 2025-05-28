@@ -1,6 +1,7 @@
-import { Application } from 'express';
-import { RoutesConfig } from '../common/interfaces/RoutesConfig';
-import UserController from '../controllers/UserController';
+import { Application } from "express";
+import { RoutesConfig } from "../common/interfaces/RoutesConfig";
+import UserController from "../controllers/UserController";
+
 
 export class UserRoutes extends RoutesConfig {
     public constructor(app: Application) {

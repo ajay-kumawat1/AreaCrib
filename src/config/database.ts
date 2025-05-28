@@ -6,7 +6,7 @@ const opts = {
   serverSelectionTimeoutMS: 10000,
   autoIndex: config.mongo.autoIndex,
   autoCreate: config.mongo.useCreateIndex,
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  socketTimeoutMS: 45000,
 };
 
 const MONGO_URI = config.mongo.url || "";
@@ -17,7 +17,7 @@ export const connectDB = async (): Promise<void> => {
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
-    process.exit(1); // Exit process with failure
+    process.exit(1);
   }
 };
 
