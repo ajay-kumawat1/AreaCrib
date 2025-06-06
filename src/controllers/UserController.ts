@@ -46,13 +46,24 @@ export default class UserController {
     }
   }
 
-  public static async getAll(
+  public static async login(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      console.log("UserController.getAll() -> Fetching all users");
+      const { email, password } = req.body;
+
+      const user = await User.findOne({ email, password });
+      if (!user) {
+        res.status(401).json({ message: "Invalid email or password" });
+        return;
+      }
+
+      // Remove password from response
+      const userObj = user.toObject();
+      delete (userObj as any).password;
+      res.status(200).json(userObj);
     } catch (error) {
       console.error(`UserController.getAll() -> Error: ${error}`);
       next(error);

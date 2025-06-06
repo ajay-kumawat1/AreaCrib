@@ -9,9 +9,9 @@ export class UserRoutes extends RoutesConfig {
     }
 
     public configureRoutes(): Application {
-        this.app.route(`${this.path}/getAll`).get(UserController.getAll);
-
         this.app.route(`${this.path}`).get(UserController.create);
+
+        this.app.route(`${this.path}/login`).get(UserController.login);
 
         return this.app;
     }
