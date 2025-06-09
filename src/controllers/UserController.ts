@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
+import bcrypt from "bcrypt";
 
 export default class UserController {
   public static async create(
@@ -24,11 +25,14 @@ export default class UserController {
         return;
       }
 
+      // Hash the password before saving
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       const newUser = new User({
         firstName,
         lastName,
         email,
-        password,
+        password: hashedPassword,
         mobileNumber,
         avatar,
         role,
