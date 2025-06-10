@@ -58,9 +58,16 @@ export default class UserController {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email, password });
+      const user = await User.findOne({ email });
       if (!user) {
-        res.status(401).json({ message: "Invalid email or password" });
+        res.status(401).json({ message: "User not foundd" });
+        return;
+      }
+
+      // Compare the provided password with the hashed password in the database
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        res.status(401).json({ message: "Invalid password" });
         return;
       }
 
