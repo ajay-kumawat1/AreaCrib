@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export default class UserController {
   public static async create(
@@ -60,7 +61,7 @@ export default class UserController {
 
       const user = await User.findOne({ email });
       if (!user) {
-        res.status(401).json({ message: "User not foundd" });
+        res.status(401).json({ message: "User not found" });
         return;
       }
 
@@ -71,12 +72,23 @@ export default class UserController {
         return;
       }
 
+      // Generate JWT token
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        throw new Error("JWT_SECRET environment variable is not defined");
+      }
+      const token = jwt.sign(
+        { id: user._id, email: user.email, role: user.role },
+        jwtSecret,
+        { expiresIn: "1h" }
+      );
+
       // Remove password from response
       const userObj = user.toObject();
       delete (userObj as any).password;
-      res.status(200).json(userObj);
+      res.status(200).json({ user: userObj, token });
     } catch (error) {
-      console.error(`UserController.getAll() -> Error: ${error}`);
+      console.error(`UserController.login() -> Error: ${error}`);
       next(error);
     }
   }
