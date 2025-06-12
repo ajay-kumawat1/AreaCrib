@@ -55,24 +55,20 @@ export default class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ) {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).lean();
       if (!user) {
-        res.status(401).json({ message: "User not found" });
-        return;
+        return res.status(401).json({ message: "User not found" });
       }
 
-      // Compare the provided password with the hashed password in the database
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        res.status(401).json({ message: "Invalid password" });
-        return;
+        return res.status(401).json({ message: "Invalid password" });
       }
 
-      // Generate JWT token
       const jwtSecret = process.env.JWT_SECRET;
       if (!jwtSecret) {
         throw new Error("JWT_SECRET environment variable is not defined");
@@ -83,10 +79,8 @@ export default class UserController {
         { expiresIn: "1h" }
       );
 
-      // Remove password from response
-      const userObj = user.toObject();
-      delete (userObj as any).password;
-      res.status(200).json({ user: userObj, token });
+      delete (user as any).password;
+      res.status(200).json({ user, token });
     } catch (error) {
       console.error(`UserController.login() -> Error: ${error}`);
       next(error);
