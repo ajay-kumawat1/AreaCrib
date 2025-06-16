@@ -31,6 +31,10 @@ const config: IConfig = {
         port: parsedEnv.PORT as number,
         host: parsedEnv.HOST as string,
     },
+    token: {
+        secret: parsedEnv.TOKEN_SECRET as string,
+        expiresIn: parsedEnv.TOKEN_EXPIRES_IN as string,
+    },
 };
 
 export default config;

@@ -15,4 +15,8 @@ export interface IConfig {
         port: number;
         host: string;
     };
+    token: {
+        secret: string;
+        expiresIn: string;
+    };
 }

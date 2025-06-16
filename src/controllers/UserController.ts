@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { signToken } from "../utils/common";
 
 export default class UserController {
   public static async create(
@@ -51,11 +52,7 @@ export default class UserController {
     }
   }
 
-  public static async login(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public static async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
 
@@ -73,14 +70,16 @@ export default class UserController {
       if (!jwtSecret) {
         throw new Error("JWT_SECRET environment variable is not defined");
       }
-      const token = jwt.sign(
-        { id: user._id, email: user.email, role: user.role },
-        jwtSecret,
-        { expiresIn: "1h" }
-      );
 
-      delete (user as any).password;
-      res.status(200).json({ user, token });
+      const payload = {
+        user: {
+          id: user._id,
+          role: user.role,
+        },
+      };
+
+      const token = await signToken(payload);
+      res.json({ token, user });
     } catch (error) {
       console.error(`UserController.login() -> Error: ${error}`);
       next(error);
