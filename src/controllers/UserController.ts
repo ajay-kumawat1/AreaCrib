@@ -85,4 +85,38 @@ export default class UserController {
       next(error);
     }
   }
+
+  // change password
+  public static async changePassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { userId, oldPassword, newPassword } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isOldPasswordValid = await bcrypt.compare(
+        oldPassword,
+        user.password
+      );
+      if (!isOldPasswordValid) {
+        return res.status(401).json({ message: "Invalid old password" });
+      }
+
+      // Hash the new password before saving
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedNewPassword;
+      await user.save();
+
+      res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error(`UserController.changePassword() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
