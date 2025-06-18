@@ -14,6 +14,7 @@ export interface IConfig {
         root: string;
         port: number;
         host: string;
+        client: string;
     };
     token: {
         secret: string;

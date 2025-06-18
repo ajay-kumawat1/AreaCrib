@@ -16,6 +16,9 @@ export class UserRoutes extends RoutesConfig {
         // change password
         this.app.route(`${this.path}/change-password`).post(UserController.changePassword);
 
+        // forgot password
+        this.app.route(`${this.path}/forgot-password`).post(UserController.forgotPassword);
+
         return this.app;
     }
 }
