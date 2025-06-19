@@ -2,9 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { signToken } from "../utils/common";
+import { sendResponse, signToken } from "../utils/common";
 import { randomBytes } from "crypto";
 import config from "../config/config";
+import { RESPONSE_CODE, RESPONSE_FAILURE } from "../common/interfaces/Constants";
 
 export default class UserController {
   public static async create(
@@ -25,8 +26,7 @@ export default class UserController {
 
       const isEmailExists = await User.findOne({ email });
       if (isEmailExists) {
-        res.status(400).json({ message: "Email already exists" });
-        return;
+        return sendResponse(res, {}, "Email already exists", RESPONSE_FAILURE, RESPONSE_CODE.BAD_REQUEST);
       }
 
       // Hash the password before saving
@@ -120,26 +120,5 @@ export default class UserController {
       console.error(`UserController.changePassword() -> Error: ${error}`);
       next(error);
     }
-  }
-
-  // forgot password through email
-  public static async forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
-    try {
-      const { email } = req.body;
-
-      const user = await User.findOne({ email }).lean();
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const token = randomBytes(32).toString('hex');
-      const resetLink = `${config.server.client}/${req.body.isNew ? 'auth/reset-password' : 'reset-password'}/${token}`;
-
-
-  }
-      
+  }    
 }
