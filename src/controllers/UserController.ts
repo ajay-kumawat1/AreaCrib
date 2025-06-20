@@ -5,7 +5,10 @@ import jwt from "jsonwebtoken";
 import { sendResponse, signToken } from "../utils/common";
 import { randomBytes } from "crypto";
 import config from "../config/config";
-import { RESPONSE_CODE, RESPONSE_FAILURE } from "../common/interfaces/Constants";
+import {
+  RESPONSE_CODE,
+  RESPONSE_FAILURE,
+} from "../common/interfaces/Constants";
 
 export default class UserController {
   public static async create(
@@ -26,7 +29,13 @@ export default class UserController {
 
       const isEmailExists = await User.findOne({ email });
       if (isEmailExists) {
-        return sendResponse(res, {}, "Email already exists", RESPONSE_FAILURE, RESPONSE_CODE.BAD_REQUEST);
+        return sendResponse(
+          res,
+          {},
+          "Email already exists",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
       }
 
       // Hash the password before saving
@@ -47,7 +56,13 @@ export default class UserController {
       const userObj = createdUser.toObject();
       delete (userObj as any).password;
 
-      res.status(201).json(userObj);
+      return sendResponse(
+        res,
+        userObj,
+        "User created successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.CREATED
+      );
     } catch (error) {
       console.error(`UserController.create() -> Error: ${error}`);
       next(error);
@@ -60,12 +75,24 @@ export default class UserController {
 
       const user = await User.findOne({ email }).lean();
       if (!user) {
-        return res.status(401).json({ message: "User not found" });
+        return sendResponse(
+          res,
+          {},
+          "User not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NO_CONTENT_FOUND
+        );
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid password" });
+        return sendResponse(
+          res,
+          {},
+          "Invalid password",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.UNAUTHORISED
+        );
       }
 
       const jwtSecret = process.env.JWT_SECRET;
@@ -81,7 +108,13 @@ export default class UserController {
       };
 
       const token = await signToken(payload);
-      res.json({ token, user });
+      return sendResponse(
+        res,
+        { token, user },
+        "Login successful",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
     } catch (error) {
       console.error(`UserController.login() -> Error: ${error}`);
       next(error);
@@ -99,7 +132,13 @@ export default class UserController {
 
       const user = await User.findById(userId);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return sendResponse(
+          res,
+          {},
+          "User not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NO_CONTENT_FOUND
+        );
       }
 
       const isOldPasswordValid = await bcrypt.compare(
@@ -107,7 +146,13 @@ export default class UserController {
         user.password
       );
       if (!isOldPasswordValid) {
-        return res.status(401).json({ message: "Invalid old password" });
+        return sendResponse(
+          res,
+          {},
+          "Old password is incorrect",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.UNAUTHORISED
+        );
       }
 
       // Hash the new password before saving
@@ -115,10 +160,16 @@ export default class UserController {
       user.password = hashedNewPassword;
       await user.save();
 
-      res.status(200).json({ message: "Password changed successfully" });
+      return sendResponse(
+        res,
+        {},
+        "Password changed successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
     } catch (error) {
       console.error(`UserController.changePassword() -> Error: ${error}`);
       next(error);
     }
-  }    
+  }
 }
