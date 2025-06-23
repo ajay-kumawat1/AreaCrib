@@ -172,4 +172,34 @@ export default class UserController {
       next(error);
     }
   }
+
+  // forgot password
+  public static async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { email } = req.body;
+
+      const user = await User.findOne({ email }).lean();
+      if (!user) {
+        return sendResponse(
+          res,
+          {},
+          "User not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NO_CONTENT_FOUND
+        );
+      }
+      // send otp in mail
+      const otp = randomBytes(3).toString("hex"); // Generate a 6-digit OTP
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
+      
+    }
+    catch (error) {
+      console.error(`UserController.forgotPassword() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
