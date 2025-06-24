@@ -8,7 +8,9 @@ import config from "../config/config";
 import {
   RESPONSE_CODE,
   RESPONSE_FAILURE,
+  RESPONSE_SUCCESS,
 } from "../common/interfaces/Constants";
+import { sendEmail } from "../utils/sendMail";
 
 export default class UserController {
   public static async create(
@@ -173,12 +175,7 @@ export default class UserController {
     }
   }
 
-  // forgot password
-  public static async forgotPassword(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public static async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;
 
@@ -187,17 +184,53 @@ export default class UserController {
         return sendResponse(
           res,
           {},
-          "User not found",
+          'User not found',
           RESPONSE_FAILURE,
           RESPONSE_CODE.NO_CONTENT_FOUND
         );
       }
-      // send otp in mail
-      const otp = randomBytes(3).toString("hex"); // Generate a 6-digit OTP
-      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
-      
-    }
-    catch (error) {
+
+      // 🧠 Generate OTP
+      const otp = randomBytes(3).toString('hex').toUpperCase(); // e.g., "A1B2C3"
+      const otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+      // ✉️ Send OTP via Email
+      const subject = 'Your Password Reset OTP';
+      const message = `
+        <p>Hello ${user.firstName || ''},</p>
+        <p>Your OTP for password reset is: <strong>${otp}</strong></p>
+        <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
+      `;
+
+      await sendEmail({
+        to: user.email,
+        subject,
+        html: message,
+      });
+
+      // 🍪 Store OTP & expiry in HTTP-only cookies
+      res.cookie('reset_otp', otp, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 10 * 60 * 1000, // 10 minutes
+        sameSite: 'strict',
+      });
+
+      res.cookie('reset_otp_expiry', otpExpiry.toString(), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 10 * 60 * 1000,
+        sameSite: 'strict',
+      });
+
+      return sendResponse(
+        res,
+        {},
+        'OTP sent successfully to your email',
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
       console.error(`UserController.forgotPassword() -> Error: ${error}`);
       next(error);
     }
