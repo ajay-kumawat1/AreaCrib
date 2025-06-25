@@ -123,7 +123,6 @@ export default class UserController {
     }
   }
 
-  // change password
   public static async changePassword(
     req: Request,
     res: Response,
