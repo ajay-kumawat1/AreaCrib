@@ -30,6 +30,7 @@ const config: IConfig = {
         root: ROOT,
         port: parsedEnv.PORT as number,
         host: parsedEnv.HOST as string,
+        client: parsedEnv.CLIENT as string,
     },
     token: {
         secret: parsedEnv.TOKEN_SECRET as string,

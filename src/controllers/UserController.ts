@@ -174,7 +174,11 @@ export default class UserController {
     }
   }
 
-  public static async forgotPassword(req: Request, res: Response, next: NextFunction) {
+  public static async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { email } = req.body;
 
@@ -183,23 +187,44 @@ export default class UserController {
         return sendResponse(
           res,
           {},
-          'User not found',
+          "User not found",
           RESPONSE_FAILURE,
           RESPONSE_CODE.NO_CONTENT_FOUND
         );
       }
 
-      // 🧠 Generate OTP
-      const otp = randomBytes(3).toString('hex').toUpperCase(); // e.g., "A1B2C3"
-      const otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+      const token = randomBytes(32).toString("hex");
+      const resetLink = `${config.server.client}/${
+        req.body.isNew ? "auth/reset-password" : "reset-password"
+      }/${token}`;
+
+      // 🛡️ Update user with reset token
+      await User.updateOne({ _id: user._id }, { resetToken: token });
 
       // ✉️ Send OTP via Email
-      const subject = 'Your Password Reset OTP';
+      const subject = "Your Password Reset Link";
       const message = `
-        <p>Hello ${user.firstName || ''},</p>
-        <p>Your OTP for password reset is: <strong>${otp}</strong></p>
-        <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
-      `;
+          <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: auto;">
+            <h2 style="color: #2c3e50;">Password Reset Request</h2>
+            
+            <p>Hello ${user.firstName || "there"},</p>
+            
+            <p>We received a request to reset your password. Click the button below to choose a new password:</p>
+            
+            <p style="text-align: center;">
+              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
+                Reset Password
+              </a>
+            </p>
+
+            <p>If the button above doesn't work, copy and paste the following link into your browser:</p>
+            <p style="word-break: break-all;">${resetLink}</p>
+            
+            <p>If you didn’t request this, you can safely ignore this email.</p>
+            
+            <p>Thanks,<br>The AJ Creation Team</p>
+          </div>
+        `;
 
       await sendEmail({
         to: user.email,
@@ -207,25 +232,10 @@ export default class UserController {
         html: message,
       });
 
-      // 🍪 Store OTP & expiry in HTTP-only cookies
-      res.cookie('reset_otp', otp, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 10 * 60 * 1000, // 10 minutes
-        sameSite: 'strict',
-      });
-
-      res.cookie('reset_otp_expiry', otpExpiry.toString(), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 10 * 60 * 1000,
-        sameSite: 'strict',
-      });
-
       return sendResponse(
         res,
         {},
-        'OTP sent successfully to your email',
+        "ResetLink sent successfully to your email",
         RESPONSE_SUCCESS,
         RESPONSE_CODE.SUCCESS
       );
