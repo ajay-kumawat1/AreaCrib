@@ -36,6 +36,7 @@ const config: IConfig = {
         secret: parsedEnv.TOKEN_SECRET as string,
         expiresIn: parsedEnv.TOKEN_EXPIRES_IN as string,
     },
+    password: parsedEnv.PASSWORD as string,
 };
 
 export default config;

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { sendResponse, signToken } from "../utils/common";
 import { randomBytes } from "crypto";
 import config from "../config/config";
@@ -11,6 +10,8 @@ import {
   RESPONSE_SUCCESS,
 } from "../common/interfaces/Constants";
 import { sendEmail } from "../utils/sendMail";
+import UserManager from "../managers/UserManager";
+import { ObjectId } from "mongoose";
 
 export default class UserController {
   public static async create(
@@ -243,5 +244,55 @@ export default class UserController {
       console.error(`UserController.forgotPassword() -> Error: ${error}`);
       next(error);
     }
+  }
+
+  public static async resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const { newPassword, confirmPassword } = req.body;
+    const { token } = req.params;
+
+    if (newPassword !== confirmPassword) {
+      return sendResponse(
+        res,
+        {},
+        "Passwords do not match",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.BAD_REQUEST
+      );
+    }
+    const user = await User.findOne({
+      resetToken: token,
+      expireToken: { $gt: Date.now() },
+    });
+    if (!user) {
+      return sendResponse(
+        res,
+        {},
+        "Invalid or expired reset token",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.UNAUTHORISED
+      );
+    }
+
+    const { hashedPassword } = await UserManager.generatePasswordAndAvatar(
+      user.email,
+      newPassword
+    );
+
+    await User.findByIdAndUpdate(user._id as string | ObjectId, {
+      $set: { password: hashedPassword },
+      $unset: { resetToken: "", expireToken: "" },
+    });
+
+    return sendResponse(
+      res,
+      {},
+      "Password reset successfully",
+      RESPONSE_SUCCESS,
+      RESPONSE_CODE.SUCCESS
+    );
   }
 }

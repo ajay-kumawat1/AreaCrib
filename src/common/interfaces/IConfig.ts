@@ -20,4 +20,5 @@ export interface IConfig {
         secret: string;
         expiresIn: string;
     };
+    password: string;
 }

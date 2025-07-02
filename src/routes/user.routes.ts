@@ -17,6 +17,8 @@ export class UserRoutes extends RoutesConfig {
 
         this.app.route(`${this.path}/forgot-password`).post(UserController.forgotPassword);
 
+        this.app.route(`${this.path}/reset-password/:token`).post(UserController.resetPassword);
+
         return this.app;
     }
 }
