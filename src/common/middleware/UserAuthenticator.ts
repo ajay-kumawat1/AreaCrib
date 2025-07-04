@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../../utils/common";
 import { RESPONSE_CODE, RESPONSE_FAILURE } from "../interfaces/Constants";
+import { validateAuth0JWT } from "./ValidAuth0Jwt";
 
 export default class UserAuthenticator {
     /**
@@ -9,6 +10,7 @@ export default class UserAuthenticator {
     public static isAuthenticated(): Array<Function> {
         return [
             UserAuthenticator.validateJWT,
+            ...validateAuth0JWT()
         ];
     }
 
