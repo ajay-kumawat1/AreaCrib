@@ -1,7 +1,7 @@
 import { Application } from "express";
 import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 import UserController from "../controllers/UserController";
-
+import UserAuthenticator from "../common/middleware/UserAuthenticator";
 
 export class UserRoutes extends RoutesConfig {
     public constructor(app: Application) {
@@ -13,7 +13,7 @@ export class UserRoutes extends RoutesConfig {
 
         this.app.route(`${this.path}/login`).post(UserController.login);
 
-        this.app.route(`${this.path}/change-password`).post(UserController.changePassword);
+        this.app.route(`${this.path}/change-password`).post(UserAuthenticator.isAuthenticated, UserController.changePassword);
 
         this.app.route(`${this.path}/forgot-password`).post(UserController.forgotPassword);
 
