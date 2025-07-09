@@ -8,7 +8,7 @@ export default class UserAuthenticator {
   /**
    * Middleware function to check if the user is authenticated.
    */
-  public static isAuthenticated(): Array<Function> {
+  public static isAuthenticated() {
     return [UserAuthenticator.validateJWT, ...validateAuth0JWT()];
   }
 
@@ -48,7 +48,11 @@ export default class UserAuthenticator {
   ): Promise<void> {
     try {
       const userDetails = req.user;
-      if (typeof userDetails === "object" && userDetails !== null && (userDetails as any)?.role === UserRole.ADMIN) {
+      if (
+        typeof userDetails === "object" &&
+        userDetails !== null &&
+        (userDetails as any)?.role === UserRole.ADMIN
+      ) {
         req.user = userDetails;
         next();
       } else {
