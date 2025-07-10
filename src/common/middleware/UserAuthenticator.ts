@@ -27,10 +27,11 @@ export default class UserAuthenticator {
           {},
           "Authentication token is missing",
           RESPONSE_FAILURE,
-          RESPONSE_CODE.UNAUTHORISED
+          RESPONSE_CODE.UNAUTHORIZED
         );
       }
     } catch (error) {
+      console.error("JWT validation error:", error);
       return sendResponse(
         res,
         {},
@@ -61,10 +62,11 @@ export default class UserAuthenticator {
           {},
           "You are not authorized to perform this action",
           RESPONSE_FAILURE,
-          RESPONSE_CODE.UNAUTHORISED
+          RESPONSE_CODE.UNAUTHORIZED
         );
       }
     } catch (error) {
+      console.error("Admin authentication error:", error);
       return sendResponse(
         res,
         {},

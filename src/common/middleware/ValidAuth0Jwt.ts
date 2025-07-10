@@ -65,7 +65,7 @@ function validateAuth0JWT(): Array<
             {},
             "Invalid authentication token",
             RESPONSE_FAILURE,
-            RESPONSE_CODE.UNAUTHORISED
+            RESPONSE_CODE.UNAUTHORIZED
           );
         }
       } catch (error) {

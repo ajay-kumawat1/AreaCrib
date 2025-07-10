@@ -94,7 +94,7 @@ export default class UserController {
           {},
           "Invalid password",
           RESPONSE_FAILURE,
-          RESPONSE_CODE.UNAUTHORISED
+          RESPONSE_CODE.UNAUTHORIZED
         );
       }
 
@@ -153,7 +153,7 @@ export default class UserController {
           {},
           "Old password is incorrect",
           RESPONSE_FAILURE,
-          RESPONSE_CODE.UNAUTHORISED
+          RESPONSE_CODE.UNAUTHORIZED
         );
       }
 
@@ -273,7 +273,7 @@ export default class UserController {
         {},
         "Invalid or expired reset token",
         RESPONSE_FAILURE,
-        RESPONSE_CODE.UNAUTHORISED
+        RESPONSE_CODE.UNAUTHORIZED
       );
     }
 
