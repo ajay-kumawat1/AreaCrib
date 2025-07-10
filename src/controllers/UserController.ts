@@ -12,6 +12,7 @@ import {
 import { sendEmail } from "../utils/sendMail";
 import UserManager from "../managers/UserManager";
 import { ObjectId } from "mongoose";
+import { UserService } from "../services/UserService";
 
 export default class UserController {
   public static async create(
@@ -20,6 +21,7 @@ export default class UserController {
     next: NextFunction
   ): Promise<void> {
     try {
+      const userService = new UserService();
       const {
         firstName,
         lastName,
@@ -30,7 +32,7 @@ export default class UserController {
         role,
       } = req.body;
 
-      const isEmailExists = await User.findOne({ email });
+      const isEmailExists = await userService.findOne({ email });
       if (isEmailExists) {
         return sendResponse(
           res,
@@ -74,9 +76,10 @@ export default class UserController {
 
   public static async login(req: Request, res: Response, next: NextFunction) {
     try {
+      const userService = new UserService();
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email }).lean();
+      const user = await userService.findOne({ email });
       if (!user) {
         return sendResponse(
           res,
@@ -132,7 +135,7 @@ export default class UserController {
     try {
       const { userId, oldPassword, newPassword } = req.body;
 
-      const user = await User.findById(userId);
+      const user = await UserService.findById(userId);
       if (!user) {
         return sendResponse(
           res,
@@ -181,9 +184,10 @@ export default class UserController {
     next: NextFunction
   ) {
     try {
+      const userService = new UserService();
       const { email } = req.body;
 
-      const user = await User.findOne({ email }).lean();
+      const user = await userService.findOne({ email });
       if (!user) {
         return sendResponse(
           res,
@@ -253,6 +257,7 @@ export default class UserController {
   ) {
     const { newPassword, confirmPassword } = req.body;
     const { token } = req.params;
+    const userService = new UserService();
 
     if (newPassword !== confirmPassword) {
       return sendResponse(
@@ -263,7 +268,8 @@ export default class UserController {
         RESPONSE_CODE.BAD_REQUEST
       );
     }
-    const user = await User.findOne({
+
+    const user = await userService.findOne({
       resetToken: token,
       expireToken: { $gt: Date.now() },
     });
@@ -282,7 +288,7 @@ export default class UserController {
       newPassword
     );
 
-    await User.findByIdAndUpdate(user._id as string | ObjectId, {
+    await UserService.updateById(user._id as string | ObjectId, {
       $set: { password: hashedPassword },
       $unset: { resetToken: "", expireToken: "" },
     });
