@@ -2,6 +2,7 @@ import { Application } from "express";
 import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 import UserController from "../controllers/UserController";
 import UserAuthenticator from "../common/middleware/UserAuthenticator";
+import { validateUser } from "../middlewares/user.middleware";
 
 export class UserRoutes extends RoutesConfig {
   public constructor(app: Application) {
@@ -9,7 +10,7 @@ export class UserRoutes extends RoutesConfig {
   }
 
   public configureRoutes(): Application {
-    this.app.route(`${this.path}`).post(UserController.create);
+    this.app.route(`${this.path}`).post(validateUser, UserController.create);
 
     this.app.route(`${this.path}/login`).post(UserController.login);
 
