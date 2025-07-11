@@ -13,6 +13,7 @@ import { sendEmail } from "../utils/sendMail";
 import UserManager from "../managers/UserManager";
 import { ObjectId } from "mongoose";
 import { UserService } from "../services/UserService";
+import UserFactory from "../factories/UserFactory";
 
 export default class UserController {
   public static async create(
@@ -46,7 +47,7 @@ export default class UserController {
       // Hash the password before saving
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = new User({
+      const newUser = UserFactory.generateUser({
         firstName,
         lastName,
         email,
@@ -55,15 +56,11 @@ export default class UserController {
         avatar,
         role,
       });
-      const createdUser = await newUser.save();
 
-      // Remove password from response
-      const userObj = createdUser.toObject();
-      delete (userObj as any).password;
-
+      const user = await userService.create(newUser);
       return sendResponse(
         res,
-        userObj,
+        user,
         "User created successfully",
         RESPONSE_FAILURE,
         RESPONSE_CODE.CREATED

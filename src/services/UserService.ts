@@ -5,9 +5,19 @@ import {
   QueryOptions,
   UpdateQuery,
 } from "mongoose";
-import { IUserDoc, User } from "../models/User";
+import { IUserDoc, NewCreatedUserDoc, User } from "../models/User";
 
 export class UserService {
+  /**
+   * Creates a new profile.
+   *
+   * @param resource - The profile object to be created.
+   * @returns A promise that resolves to the created profile document.
+   */
+  public async create(resource: NewCreatedUserDoc): Promise<IUserDoc> {
+    return User.create(resource);
+  }
+
   /**
    * Find one user document based on the provided query.
    *
