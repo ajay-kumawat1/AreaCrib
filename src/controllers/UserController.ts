@@ -182,7 +182,7 @@ export default class UserController {
   ) {
     try {
       const userService = new UserService();
-      const { email } = req.body;
+      const { email, isNew } = req.body;
 
       const user = await userService.findOne({ email });
       if (!user) {
@@ -197,47 +197,38 @@ export default class UserController {
 
       const token = randomBytes(32).toString("hex");
       const resetLink = `${config.server.client}/${
-        req.body.isNew ? "auth/reset-password" : "reset-password"
+        isNew ? "auth/reset-password" : "reset-password"
       }/${token}`;
 
-      // 🛡️ Update user with reset token
-      await User.updateOne({ _id: user._id }, { resetToken: token });
+      // Update user with reset token and set expiry (1 hour from now)
+      await UserService.updateById(user._id as string, {
+        resetToken: token,
+        expireToken: Date.now() + 3600000,
+      });
 
-      // ✉️ Send OTP via Email
       const subject = "Your Password Reset Link";
       const message = `
           <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: auto;">
             <h2 style="color: #2c3e50;">Password Reset Request</h2>
-            
             <p>Hello ${user.firstName || "there"},</p>
-            
             <p>We received a request to reset your password. Click the button below to choose a new password:</p>
-            
             <p style="text-align: center;">
               <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
                 Reset Password
               </a>
             </p>
-
-            <p>If the button above doesn't work, copy and paste the following link into your browser:</p>
-            <p style="word-break: break-all;">${resetLink}</p>
-            
-            <p>If you didn’t request this, you can safely ignore this email.</p>
-            
+            <p>If the button above doesn't work, copy and paste this link: ${resetLink}</p>
+            <p>This link will expire in 1 hour. If you didn't request this, please ignore this email.</p>
             <p>Thanks,<br>The AJ Creation Team</p>
           </div>
         `;
 
-      await sendEmail({
-        to: user.email,
-        subject,
-        html: message,
-      });
+      await sendEmail({ to: email, subject, html: message });
 
       return sendResponse(
         res,
         {},
-        "ResetLink sent successfully to your email",
+        "Reset link sent successfully to your email",
         RESPONSE_SUCCESS,
         RESPONSE_CODE.SUCCESS
       );
