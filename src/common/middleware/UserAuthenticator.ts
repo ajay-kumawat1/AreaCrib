@@ -4,12 +4,12 @@ import { RESPONSE_CODE, RESPONSE_FAILURE } from "../interfaces/Constants";
 import { validateAuth0JWT } from "./ValidAuth0Jwt";
 import { UserRole } from "../enum/Role";
 
-export default class UserAuthenticator {
+export default class AuthAuthenticator {
   /**
    * Middleware function to check if the user is authenticated.
    */
   public static isAuthenticated() {
-    return [UserAuthenticator.validateJWT, ...validateAuth0JWT()];
+    return [AuthAuthenticator.validateJWT, ...validateAuth0JWT()];
   }
 
   protected static async validateJWT(

@@ -1,24 +1,24 @@
-import { Application, Router } from 'express';
+import { Application, Router } from "express";
 
-import { IRoutes } from '../common/interfaces/IRoutes';
-import { RoutesConfig } from '../common/interfaces/RoutesConfig';
+import { IRoutes } from "../common/interfaces/IRoutes";
+import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 // Modules
-import { UserRoutes } from './user.routes';
+import { AuthRoutes } from "./auth.routes";
 
 export class IndexRoute implements IRoutes {
-    public router = Router({ mergeParams: true });
-    public routerArray: Array<RoutesConfig> = [];
-    public path = '/api';
+  public router = Router({ mergeParams: true });
+  public routerArray: Array<RoutesConfig> = [];
+  public path = "/api";
 
-    public constructor(app: Application) {
-        this.initializeRoutes(app);
-    }
+  public constructor(app: Application) {
+    this.initializeRoutes(app);
+  }
 
-    private initializeRoutes(app: Application): void {
-        this.routerArray.push(new UserRoutes(app));
+  private initializeRoutes(app: Application): void {
+    this.routerArray.push(new AuthRoutes(app));
 
-        this.routerArray.forEach((route: RoutesConfig) => {
-            console.log(`Routes configured for ${route.getName()}`);
-        });
-    }
+    this.routerArray.forEach((route: RoutesConfig) => {
+      console.log(`Routes configured for ${route.getName()}`);
+    });
+  }
 }

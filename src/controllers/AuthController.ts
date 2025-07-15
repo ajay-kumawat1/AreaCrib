@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import { sendResponse, signToken } from "../utils/common";
 import { randomBytes } from "crypto";
@@ -15,7 +14,7 @@ import { ObjectId } from "mongoose";
 import { UserService } from "../services/UserService";
 import UserFactory from "../factories/UserFactory";
 
-export default class UserController {
+export default class AuthController {
   public static async create(
     req: Request,
     res: Response,

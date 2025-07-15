@@ -8,7 +8,7 @@ import {
   RESPONSE_FAILURE,
 } from "../common/interfaces/Constants";
 
-const validateUser = async (
+const validateAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -53,4 +53,4 @@ const validateUser = async (
   }
 };
 
-export { validateUser };
+export { validateAuth };
