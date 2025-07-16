@@ -1,0 +1,18 @@
+import { Application } from "express";
+import { RoutesConfig } from "../common/interfaces/RoutesConfig";
+import UserController from "../controllers/UserController";
+import AuthAuthenticator from "../common/middleware/UserAuthenticator";
+
+export class AuthRoutes extends RoutesConfig {
+  public constructor(app: Application) {
+    super(app, "user", "UserRoutes");
+  }
+
+  public configureRoutes(): Application {
+    this.app
+      .route(`${this.path}/getMy`)
+      .get(AuthAuthenticator.isAuthenticated(), UserController.getMy);
+
+    return this.app;
+  }
+}
