@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserService } from "../services/UserService";
 import { sendResponse } from "../utils/common";
 import {
@@ -6,9 +6,14 @@ import {
   RESPONSE_FAILURE,
   RESPONSE_SUCCESS,
 } from "../common/interfaces/Constants";
+import { logger } from "../utils/logger";
 
 export default class UserController {
-  public static async getMy(req: Request, res: Response): Promise<void> {
+  public static async getMy(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const userService = new UserService();
 
@@ -31,8 +36,8 @@ export default class UserController {
         RESPONSE_CODE.SUCCESS
       );
     } catch (error) {
-      console.error(`UserController.getMy() -> Error: ${error}`);
-      res.status(500).send({ error: "Internal Server Error" });
+      logger.error(`UserController.getMy() -> Error: ${error}`);
+      next(error);
     }
   }
 }
