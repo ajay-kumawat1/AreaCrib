@@ -13,6 +13,7 @@ import UserManager from "../managers/UserManager";
 import { ObjectId } from "mongoose";
 import { UserService } from "../services/UserService";
 import UserFactory from "../factories/UserFactory";
+import { logger } from "../utils/logger";
 
 export default class AuthController {
   public static async create(
@@ -65,7 +66,7 @@ export default class AuthController {
         RESPONSE_CODE.CREATED
       );
     } catch (error) {
-      console.error(`UserController.create() -> Error: ${error}`);
+      logger.error(`AuthController.create() -> Error: ${error}`);
       next(error);
     }
   }
@@ -118,7 +119,7 @@ export default class AuthController {
         RESPONSE_CODE.SUCCESS
       );
     } catch (error) {
-      console.error(`UserController.login() -> Error: ${error}`);
+      logger.error(`AuthController.login() -> Error: ${error}`);
       next(error);
     }
   }
@@ -169,7 +170,7 @@ export default class AuthController {
         RESPONSE_CODE.SUCCESS
       );
     } catch (error) {
-      console.error(`UserController.changePassword() -> Error: ${error}`);
+      logger.error(`AuthController.changePassword() -> Error: ${error}`);
       next(error);
     }
   }
@@ -232,7 +233,7 @@ export default class AuthController {
         RESPONSE_CODE.SUCCESS
       );
     } catch (error) {
-      console.error(`UserController.forgotPassword() -> Error: ${error}`);
+      logger.error(`AuthController.forgotPassword() -> Error: ${error}`);
       next(error);
     }
   }
@@ -242,50 +243,55 @@ export default class AuthController {
     res: Response,
     next: NextFunction
   ) {
-    const { newPassword, confirmPassword } = req.body;
-    const { token } = req.params;
-    const userService = new UserService();
+    try {
+      const { newPassword, confirmPassword } = req.body;
+      const { token } = req.params;
+      const userService = new UserService();
 
-    if (newPassword !== confirmPassword) {
+      if (newPassword !== confirmPassword) {
+        return sendResponse(
+          res,
+          {},
+          "Passwords do not match",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
+      }
+
+      const user = await userService.findOne({
+        resetToken: token,
+        expireToken: { $gt: Date.now() },
+      });
+      if (!user) {
+        return sendResponse(
+          res,
+          {},
+          "Invalid or expired reset token",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.UNAUTHORIZED
+        );
+      }
+
+      const { hashedPassword } = await UserManager.generatePasswordAndAvatar(
+        user.email,
+        newPassword
+      );
+
+      await UserService.updateById(user._id as string | ObjectId, {
+        $set: { password: hashedPassword },
+        $unset: { resetToken: "", expireToken: "" },
+      });
+
       return sendResponse(
         res,
         {},
-        "Passwords do not match",
-        RESPONSE_FAILURE,
-        RESPONSE_CODE.BAD_REQUEST
+        "Password reset successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
       );
+    } catch (error) {
+      logger.error(`AuthController.resetPassword() -> Error: ${error}`);
+      next(error);
     }
-
-    const user = await userService.findOne({
-      resetToken: token,
-      expireToken: { $gt: Date.now() },
-    });
-    if (!user) {
-      return sendResponse(
-        res,
-        {},
-        "Invalid or expired reset token",
-        RESPONSE_FAILURE,
-        RESPONSE_CODE.UNAUTHORIZED
-      );
-    }
-
-    const { hashedPassword } = await UserManager.generatePasswordAndAvatar(
-      user.email,
-      newPassword
-    );
-
-    await UserService.updateById(user._id as string | ObjectId, {
-      $set: { password: hashedPassword },
-      $unset: { resetToken: "", expireToken: "" },
-    });
-
-    return sendResponse(
-      res,
-      {},
-      "Password reset successfully",
-      RESPONSE_SUCCESS,
-      RESPONSE_CODE.SUCCESS
-    );
   }
 }
