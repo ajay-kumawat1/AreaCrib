@@ -22,7 +22,6 @@ export default class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userService = new UserService();
       const {
         firstName,
         lastName,
@@ -33,8 +32,9 @@ export default class AuthController {
         role,
       } = req.body;
 
-      const isEmailExists = await userService.findOne({ email });
-      if (isEmailExists) {
+      const userService = new UserService();
+
+      if (await userService.findOne({ email })) {
         return sendResponse(
           res,
           {},
@@ -44,20 +44,20 @@ export default class AuthController {
         );
       }
 
-      // Hash the password before saving
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = UserFactory.generateUser({
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword,
-        mobileNumber,
-        avatar,
-        role,
-      });
+      const user = await userService.create(
+        UserFactory.generateUser({
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword,
+          mobileNumber,
+          avatar,
+          role,
+        })
+      );
 
-      const user = await userService.create(newUser);
       return sendResponse(
         res,
         user,
@@ -73,8 +73,8 @@ export default class AuthController {
 
   public static async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const userService = new UserService();
       const { email, password } = req.body;
+      const userService = new UserService();
 
       const user = await userService.findOne({ email });
       if (!user) {
@@ -87,8 +87,7 @@ export default class AuthController {
         );
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
+      if (!(await bcrypt.compare(password, user.password))) {
         return sendResponse(
           res,
           {},
@@ -98,24 +97,19 @@ export default class AuthController {
         );
       }
 
-      const jwtSecret = process.env.JWT_SECRET;
-      if (!jwtSecret) {
+      if (!process.env.JWT_SECRET) {
         throw new Error("JWT_SECRET environment variable is not defined");
       }
 
-      const payload = {
-        user: {
-          id: user._id,
-          role: user.role,
-        },
-      };
+      const token = await signToken({
+        user: { id: user._id, role: user.role },
+      });
 
-      const token = await signToken(payload);
       return sendResponse(
         res,
         { token, user },
         "Login successful",
-        RESPONSE_FAILURE,
+        RESPONSE_SUCCESS,
         RESPONSE_CODE.SUCCESS
       );
     } catch (error) {
@@ -143,11 +137,7 @@ export default class AuthController {
         );
       }
 
-      const isOldPasswordValid = await bcrypt.compare(
-        oldPassword,
-        user.password
-      );
-      if (!isOldPasswordValid) {
+      if (!(await bcrypt.compare(oldPassword, user.password))) {
         return sendResponse(
           res,
           {},
@@ -157,16 +147,14 @@ export default class AuthController {
         );
       }
 
-      // Hash the new password before saving
-      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedNewPassword;
+      user.password = await bcrypt.hash(newPassword, 10);
       await user.save();
 
       return sendResponse(
         res,
         {},
         "Password changed successfully",
-        RESPONSE_FAILURE,
+        RESPONSE_SUCCESS,
         RESPONSE_CODE.SUCCESS
       );
     } catch (error) {
@@ -181,8 +169,8 @@ export default class AuthController {
     next: NextFunction
   ) {
     try {
-      const userService = new UserService();
       const { email, isNew } = req.body;
+      const userService = new UserService();
 
       const user = await userService.findOne({ email });
       if (!user) {
@@ -200,28 +188,29 @@ export default class AuthController {
         isNew ? "auth/reset-password" : "reset-password"
       }/${token}`;
 
-      // Update user with reset token and set expiry (1 hour from now)
+      // Set reset token and expiry (1 hour)
       await UserService.updateById(user._id as string, {
         resetToken: token,
         expireToken: Date.now() + 3600000,
       });
 
       const subject = "Your Password Reset Link";
+      const firstName = user.firstName || "there";
       const message = `
-          <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: auto;">
-            <h2 style="color: #2c3e50;">Password Reset Request</h2>
-            <p>Hello ${user.firstName || "there"},</p>
-            <p>We received a request to reset your password. Click the button below to choose a new password:</p>
-            <p style="text-align: center;">
-              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
-                Reset Password
-              </a>
-            </p>
-            <p>If the button above doesn't work, copy and paste this link: ${resetLink}</p>
-            <p>This link will expire in 1 hour. If you didn't request this, please ignore this email.</p>
-            <p>Thanks,<br>The AJ Creation Team</p>
-          </div>
-        `;
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: auto;">
+          <h2 style="color: #2c3e50;">Password Reset Request</h2>
+          <p>Hello ${firstName},</p>
+          <p>We received a request to reset your password. Click the button below to choose a new password:</p>
+          <p style="text-align: center;">
+            <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
+              Reset Password
+            </a>
+          </p>
+          <p>If the button above doesn't work, copy and paste this link: ${resetLink}</p>
+          <p>This link will expire in 1 hour. If you didn't request this, please ignore this email.</p>
+          <p>Thanks,<br>The AJ Creation Team</p>
+        </div>
+      `;
 
       await sendEmail({ to: email, subject, html: message });
 
@@ -246,7 +235,6 @@ export default class AuthController {
     try {
       const { newPassword, confirmPassword } = req.body;
       const { token } = req.params;
-      const userService = new UserService();
 
       if (newPassword !== confirmPassword) {
         return sendResponse(
@@ -258,10 +246,12 @@ export default class AuthController {
         );
       }
 
+      const userService = new UserService();
       const user = await userService.findOne({
         resetToken: token,
         expireToken: { $gt: Date.now() },
       });
+
       if (!user) {
         return sendResponse(
           res,
@@ -277,8 +267,8 @@ export default class AuthController {
         newPassword
       );
 
-      await UserService.updateById(user._id as string | ObjectId, {
-        $set: { password: hashedPassword },
+      await UserService.updateById(user._id as string, {
+        password: hashedPassword,
         $unset: { resetToken: "", expireToken: "" },
       });
 
