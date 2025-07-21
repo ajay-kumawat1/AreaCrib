@@ -73,4 +73,47 @@ export default class UserController {
       next(error);
     }
   }
+
+  public static async update(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const updateData = req.body;
+
+      if (!userId) {
+        return sendResponse(
+          res,
+          {},
+          "User ID is missing",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
+      }
+
+      const updatedUser = await UserService.updateById(userId, updateData);
+      if (!updatedUser) {
+        return sendResponse(
+          res,
+          {},
+          "User update failed",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      return sendResponse(
+        res,
+        updatedUser,
+        "User updated successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`UserController.update() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
