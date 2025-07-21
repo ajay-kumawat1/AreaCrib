@@ -40,4 +40,37 @@ export default class UserController {
       next(error);
     }
   }
+
+  public static async getById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userService = new UserService();
+      const userId = req.params.id;
+
+      const user = await userService.findOne({ _id: userId });
+      if (!user) {
+        return sendResponse(
+          res,
+          {},
+          "User not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      return sendResponse(
+        res,
+        user,
+        "User retrieved successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`UserController.getById() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
