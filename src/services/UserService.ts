@@ -59,4 +59,14 @@ export class UserService {
   ): Promise<IUserDoc | null> {
     return User.findByIdAndUpdate(id, updateDoc, options);
   }
+
+  /**
+   * Deletes a profile document by its ID.
+   *
+   * @param id - The ID of the profile document to delete.
+   * @returns A promise that resolves to the deleted profile document.
+   */
+  public async deleteById(id: string | ObjectId): Promise<IUserDoc | null> {
+    return User.findByIdAndDelete(id);
+  }
 }

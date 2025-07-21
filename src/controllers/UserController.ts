@@ -116,4 +116,50 @@ export default class UserController {
       next(error);
     }
   }
+
+  public static async delete(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.params.id;
+
+      if (!userId) {
+        return sendResponse(
+          res,
+          {},
+          "User ID is required",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
+      }
+
+      const userService = new UserService();
+      const deletedUser = await userService.findOne({ _id: userId });
+
+      if (!deletedUser) {
+        return sendResponse(
+          res,
+          {},
+          "User not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      await userService.deleteById(userId);
+
+      return sendResponse(
+        res,
+        {},
+        "User deleted successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`UserController.delete() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }

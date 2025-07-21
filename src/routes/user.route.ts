@@ -21,6 +21,10 @@ export class AuthRoutes extends RoutesConfig {
       .route(`${this.path}`)
       .put(AuthAuthenticator.isAuthenticated(), UserController.update);
 
+    this.app
+      .route(`${this.path}/:id`)
+      .delete(AuthAuthenticator.isAuthenticated(), UserController.delete);
+
     return this.app;
   }
 }
