@@ -74,6 +74,40 @@ export default class UserController {
     }
   }
 
+  public static async getAll(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const skip = (page - 1) * limit;
+
+      const [users, total] = await Promise.all([
+        UserService.find({}, { skip, limit }),
+        UserService.count({}),
+      ]);
+
+      return sendResponse(
+        res,
+        {
+          users,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+        "Users retrieved successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`UserController.getAll() -> Error: ${error}`);
+      next(error);
+    }
+  }
+
   public static async update(
     req: Request,
     res: Response,

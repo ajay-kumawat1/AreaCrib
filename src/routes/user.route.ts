@@ -19,6 +19,10 @@ export class AuthRoutes extends RoutesConfig {
 
     this.app
       .route(`${this.path}`)
+      .get(AuthAuthenticator.isAdminAuthenticated(), UserController.getAll);
+
+    this.app
+      .route(`${this.path}`)
       .put(AuthAuthenticator.isAuthenticated(), UserController.update);
 
     this.app

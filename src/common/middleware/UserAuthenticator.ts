@@ -12,6 +12,14 @@ export default class AuthAuthenticator {
     return [AuthAuthenticator.validateJWT, ...validateAuth0JWT()];
   }
 
+  public static isAdminAuthenticated() {
+    return [
+      AuthAuthenticator.validateJWT,
+      ...validateAuth0JWT(),
+      AuthAuthenticator.isAdminLoggedIn,
+    ];
+  }
+
   protected static async validateJWT(
     req: Request,
     res: Response,
