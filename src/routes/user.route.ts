@@ -3,7 +3,7 @@ import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 import UserController from "../controllers/UserController";
 import AuthAuthenticator from "../common/middleware/UserAuthenticator";
 
-export class AuthRoutes extends RoutesConfig {
+export class UserRoutes extends RoutesConfig {
   public constructor(app: Application) {
     super(app, "user", "UserRoutes");
   }
