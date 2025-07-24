@@ -5,7 +5,13 @@ export interface ICity {
   country: string;
 }
 
-const citySchema = new Schema<ICity>(
+export interface ICityDoc extends ICity, Document {}
+
+// CRUD TYPES
+export type UpdateCityBody = Partial<ICity>;
+export type NewCityDoc = Omit<ICity, "created">;
+
+const citySchema = new Schema<ICityDoc>(
   {
     name: { type: String, required: true },
     country: { type: String, required: true },
@@ -15,4 +21,4 @@ const citySchema = new Schema<ICity>(
   }
 );
 
-export const City = model<ICity>("City", citySchema, "cities");
+export const City = model<ICityDoc>("City", citySchema, "cities");
