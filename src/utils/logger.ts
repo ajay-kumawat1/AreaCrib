@@ -5,7 +5,7 @@ const logFormats: winston.Logform.Format[] = [
   format.colorize(),
   format.timestamp({ format: "YYYY-MM-DD hh:mm:ss A" }),
   format.align(),
-  format.printf((info) => {
+  format.printf((info: { [x: string]: any; timestamp: any; level: any; message: any; }) => {
     const { timestamp: _timestamp, level, message, ...args } = info;
     return `{"level": "${level}", "message": "${message}", "data":  ${
       Object.keys(args).length ? JSON.stringify({ ...args }) : ""
