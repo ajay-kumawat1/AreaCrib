@@ -26,6 +26,10 @@ export class AuthRoutes extends RoutesConfig {
       .route(`${this.path}/reset-password/:token`)
       .post(AuthController.resetPassword);
 
+    this.app
+      .route(`${this.path}/logout`)
+      .post(AuthController.logout);
+
     return this.app;
   }
 }
