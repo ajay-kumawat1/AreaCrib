@@ -9,6 +9,28 @@ import { logger } from "../utils/logger";
 import { CityService } from "../services/CityService";
 
 export default class CityController {
+  public static async create(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const cityService = new CityService();
+
+      const newCity = await cityService.create(req.body);
+      return sendResponse(
+        res,
+        newCity,
+        "City created successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.CREATED
+      );
+    } catch (error) {
+      logger.error(`CityController.create() -> Error: ${error}`);
+      next(error);
+    }
+  }
+
   public static async getAll(
     req: Request,
     res: Response,
@@ -35,28 +57,6 @@ export default class CityController {
       );
     } catch (error) {
       logger.error(`CityController.getAll() -> Error: ${error}`);
-      next(error);
-    }
-  }
-
-  public static async create(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const cityService = new CityService();
-
-      const newCity = await cityService.create(req.body);
-      return sendResponse(
-        res,
-        newCity,
-        "City created successfully",
-        RESPONSE_SUCCESS,
-        RESPONSE_CODE.CREATED
-      );
-    } catch (error) {
-      logger.error(`CityController.create() -> Error: ${error}`);
       next(error);
     }
   }

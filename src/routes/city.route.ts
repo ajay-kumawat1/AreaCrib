@@ -10,12 +10,12 @@ export class CityRoute extends RoutesConfig {
 
   public configureRoutes(): Application {
     this.app
-      .route(`${this.path}/getAll`)
-      .get(AuthAuthenticator.isAuthenticated(), CityController.getAll);
-
-    this.app
       .route(`${this.path}`)
       .post(AuthAuthenticator.isAdminAuthenticated(), CityController.create);
+
+    this.app
+      .route(`${this.path}/getAll`)
+      .get(AuthAuthenticator.isAuthenticated(), CityController.getAll);
 
     return this.app;
   }
