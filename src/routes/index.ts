@@ -4,7 +4,7 @@ import { IRoutes } from "../common/interfaces/IRoutes";
 import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 
 // Modules
-import { AuthRoutes } from "./auth.routes";
+import { AuthRoutes } from "./auth.route";
 import { UserRoutes } from "./user.route";
 import { CityRoute } from "./city.route";
 
