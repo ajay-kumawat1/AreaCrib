@@ -75,4 +75,45 @@ export default class LocalityController {
       next(error);
     }
   }
+
+  public static async getById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const localityId = req.params.id;
+      if (!localityId) {
+        return sendResponse(
+          res,
+          {},
+          "Locality ID is required",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
+      }
+
+      const locality = await LocalityService.find({ _id: localityId });
+      if (!locality || locality.length === 0) {
+        return sendResponse(
+          res,
+          {},
+          "Locality not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      return sendResponse(
+        res,
+        locality[0],
+        "Locality retrieved successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`LocalityController.getById() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
