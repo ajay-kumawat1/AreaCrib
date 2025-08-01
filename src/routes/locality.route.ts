@@ -8,6 +8,7 @@ export class LocalityRoute extends RoutesConfig {
   }
 
   public configureRoutes(): Application {
+    this.app.route(`${this.path}`).post(LocalityController.create);
     this.app.route(`${this.path}/getAll`).get(LocalityController.getAll);
 
     return this.app;

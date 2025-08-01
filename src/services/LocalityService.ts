@@ -1,5 +1,5 @@
 import { FilterQuery, ProjectionType, SortOrder } from "mongoose";
-import { ILocalityDoc, Locality } from "../models/locality";
+import { ILocalityDoc, Locality, NewLocalityDoc } from "../models/locality";
 
 export class LocalityService {
   /**
@@ -32,5 +32,15 @@ export class LocalityService {
       cursor.skip(Math.max(page - 1, 0) * limit).limit(limit);
     }
     return cursor;
+  }
+
+  /**
+   * Creates a new locality.
+   *
+   * @param resource - The locality object to be created.
+   * @returns A promise that resolves to the created locality document.
+   */
+  public async create(resource: NewLocalityDoc): Promise<ILocalityDoc> {
+    return Locality.create(resource);
   }
 }

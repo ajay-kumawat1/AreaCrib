@@ -6,6 +6,7 @@ import {
   RESPONSE_CODE,
   RESPONSE_FAILURE,
 } from "../common/interfaces/Constants";
+import { Schema } from "mongoose";
 
 export default class LocalityController {
   public static async getAll(
@@ -34,6 +35,43 @@ export default class LocalityController {
       );
     } catch (error) {
       logger.error(`LocalityController.getAll() -> Error: ${error}`);
+      next(error);
+    }
+  }
+
+  public static async create(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const localityService = new LocalityService();
+      req.body = {
+        ...req.body,
+        city: new Schema.Types.ObjectId(req.body.city),
+        createdBy: req.user?.id,
+      };
+
+      const newLocality = await localityService.create(req.body);
+      if (!newLocality) {
+        return sendResponse(
+          res,
+          {},
+          "Locality creation failed",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      return sendResponse(
+        res,
+        newLocality,
+        "Locality created successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.CREATED
+      );
+    } catch (error) {
+      logger.error(`LocalityController.create() -> Error: ${error}`);
       next(error);
     }
   }
