@@ -7,6 +7,7 @@ import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 import { AuthRoutes } from "./auth.route";
 import { UserRoutes } from "./user.route";
 import { CityRoute } from "./city.route";
+import { LocalityRoute } from "./locality.route";
 
 export class IndexRoute implements IRoutes {
   public router = Router({ mergeParams: true });
@@ -21,6 +22,7 @@ export class IndexRoute implements IRoutes {
     this.routerArray.push(new AuthRoutes(app));
     this.routerArray.push(new UserRoutes(app));
     this.routerArray.push(new CityRoute(app));
+    this.routerArray.push(new LocalityRoute(app));
 
     this.routerArray.forEach((route: RoutesConfig) => {
       console.log(`Routes configured for ${route.getName()}`);
