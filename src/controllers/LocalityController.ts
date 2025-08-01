@@ -116,4 +116,45 @@ export default class LocalityController {
       next(error);
     }
   }
+
+  public static async getByCity(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const cityId = req.params.cityId;
+      if (!cityId) {
+        return sendResponse(
+          res,
+          {},
+          "City ID is required",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
+      }
+
+      const localities = await LocalityService.find({ city: cityId });
+      if (!localities || localities.length === 0) {
+        return sendResponse(
+          res,
+          [],
+          "No localities found for the specified city",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      return sendResponse(
+        res,
+        localities,
+        "Localities retrieved successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`LocalityController.getByCity() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }

@@ -11,6 +11,9 @@ export class LocalityRoute extends RoutesConfig {
     this.app.route(`${this.path}`).post(LocalityController.create);
     this.app.route(`${this.path}/getAll`).get(LocalityController.getAll);
     this.app.route(`${this.path}/:id`).get(LocalityController.getById);
+    this.app
+      .route(`${this.path}/city/:cityId`)
+      .get(LocalityController.getByCity);
 
     return this.app;
   }
