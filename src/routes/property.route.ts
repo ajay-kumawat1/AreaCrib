@@ -1,6 +1,7 @@
 import { Application } from "express";
 import { RoutesConfig } from "../common/interfaces/RoutesConfig";
 import PropertyController from "../controllers/PropertyController";
+import AuthAuthenticator from "../common/middleware/UserAuthenticator";
 
 export class PropertyRoutes extends RoutesConfig {
   public constructor(app: Application) {
@@ -8,7 +9,9 @@ export class PropertyRoutes extends RoutesConfig {
   }
 
   public configureRoutes(): Application {
-    this.app.route(`${this.path}`).get(PropertyController.getAll);
+    this.app
+      .route(`${this.path}`)
+      .get(AuthAuthenticator.isAdminAuthenticated(), PropertyController.getAll);
 
     return this.app;
   }

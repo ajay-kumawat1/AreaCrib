@@ -8,7 +8,11 @@ import {
 } from "../common/interfaces/Constants";
 
 export default class PropertyController {
-  public static async getAll(req: Request, res: Response, next: NextFunction) {
+  public static async getAll(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const properties = await PropertyService.find({});
       if (!properties) {
