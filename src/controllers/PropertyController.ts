@@ -55,8 +55,16 @@ export default class PropertyController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const properties = await PropertyService.find({});
-      if (!properties) {
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
+      const skip = (page - 1) * limit;
+
+      const [properties, total] = await Promise.all([
+        PropertyService.find({}, { skip, limit }),
+        PropertyService.count({}),
+      ]);
+
+      if (!properties || properties.length === 0) {
         return sendResponse(
           res,
           {},
@@ -68,7 +76,13 @@ export default class PropertyController {
 
       return sendResponse(
         res,
-        properties,
+        {
+          properties,
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
         "Properties fetched successfully",
         RESPONSE_FAILURE,
         RESPONSE_CODE.SUCCESS

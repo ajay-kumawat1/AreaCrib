@@ -51,6 +51,10 @@ export class PropertyService {
     return Property.create(resource);
   }
 
+  public static count(query: FilterQuery<IPropertyDoc>): Promise<number> {
+    return Property.countDocuments(query).exec();
+  }
+
   /**
    * Find one property document based on the provided query.
    *
