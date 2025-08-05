@@ -80,4 +80,14 @@ export class PropertyService {
   ): Promise<IPropertyDoc | null> {
     return Property.findByIdAndUpdate(id, updateDoc, options);
   }
+
+  /**
+   * Deletes a property document by its ID.
+   *
+   * @param id - The ID of the property document to delete.
+   * @returns A promise that resolves to the deleted property document.
+   */
+  public async deleteById(id: string | ObjectId): Promise<IPropertyDoc | null> {
+    return Property.findByIdAndDelete(id);
+  }
 }

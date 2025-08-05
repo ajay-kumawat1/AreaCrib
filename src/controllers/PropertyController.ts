@@ -189,4 +189,48 @@ export default class PropertyController {
       next(error);
     }
   }
+
+  public static async delete(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const propertyId = req.params.id;
+      const propertyService = new PropertyService();
+
+      const property = await propertyService.findOne({ _id: propertyId });
+      if (!property) {
+        return sendResponse(
+          res,
+          {},
+          "Property not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      const deletedProperty = await propertyService.deleteById(propertyId);
+      if (!deletedProperty) {
+        return sendResponse(
+          res,
+          {},
+          "Property deletion failed",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      return sendResponse(
+        res,
+        deletedProperty,
+        "Property deleted successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`PropertyController.delete() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
