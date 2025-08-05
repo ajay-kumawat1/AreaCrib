@@ -11,6 +11,10 @@ export class PropertyRoutes extends RoutesConfig {
   public configureRoutes(): Application {
     this.app
       .route(`${this.path}`)
+      .post(AuthAuthenticator.isAuthenticated(), PropertyController.create);
+
+    this.app
+      .route(`${this.path}`)
       .get(AuthAuthenticator.isAdminAuthenticated(), PropertyController.getAll);
 
     this.app

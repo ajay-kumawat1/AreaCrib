@@ -1,5 +1,5 @@
 import { FilterQuery, ProjectionType, SortOrder } from "mongoose";
-import { IPropertyDoc, Property } from "../models/Property";
+import { IPropertyDoc, NewPropertyDoc, Property } from "../models/Property";
 
 export class PropertyService {
   /**
@@ -32,5 +32,29 @@ export class PropertyService {
       cursor.skip(Math.max(page - 1, 0) * limit).limit(limit);
     }
     return cursor;
+  }
+
+  /**
+   * Creates a new property.
+   *
+   * @param resource - The property object to be created.
+   * @returns A promise that resolves to the created property document.
+   */
+  public async create(resource: NewPropertyDoc): Promise<IPropertyDoc> {
+    return Property.create(resource);
+  }
+
+  /**
+   * Find one property document based on the provided query.
+   *
+   * @param query - The query object to filter the property documents.
+   * @param projection - The options object to specify the projection of the property documents.
+   * @returns A promise that resolves to the found property document.
+   */
+  public async findOne(
+    query: FilterQuery<IPropertyDoc>,
+    projection?: ProjectionType<IPropertyDoc>
+  ): Promise<IPropertyDoc | null> {
+    return Property.findOne(query, projection);
   }
 }

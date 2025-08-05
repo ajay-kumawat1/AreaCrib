@@ -8,6 +8,47 @@ import {
 } from "../common/interfaces/Constants";
 
 export default class PropertyController {
+  public static async create(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const propertyService = new PropertyService();
+
+      const isPropertyExists = await propertyService.findOne({
+        title: req.body.title,
+        LocalityId: req.body.LocalityId,
+      });
+
+      if (isPropertyExists) {
+        return sendResponse(
+          res,
+          {},
+          "Property with this title already exists in this locality",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
+      }
+      req.body = {
+        ...req.body,
+        createdBy: req.user?.id,
+      };
+
+      const newProperty = await propertyService.create(req.body);
+      return sendResponse(
+        res,
+        newProperty,
+        "Property created successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.CREATED
+      );
+    } catch (error) {
+      logger.error(`PropertyController.create() -> Error: ${error}`);
+      next(error);
+    }
+  }
+
   public static async getAll(
     req: Request,
     res: Response,
