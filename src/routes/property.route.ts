@@ -13,6 +13,10 @@ export class PropertyRoutes extends RoutesConfig {
       .route(`${this.path}`)
       .get(AuthAuthenticator.isAdminAuthenticated(), PropertyController.getAll);
 
+    this.app
+      .route(`${this.path}/getMy`)
+      .get(AuthAuthenticator.isAuthenticated(), PropertyController.getMy);
+
     return this.app;
   }
 }

@@ -37,4 +37,35 @@ export default class PropertyController {
       next(error);
     }
   }
+
+  public static async getMy(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const properties = await PropertyService.find({ createdBy: userId });
+      if (!properties) {
+        return sendResponse(
+          res,
+          {},
+          "No properties found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      return sendResponse(
+        res,
+        properties,
+        "Properties fetched successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`PropertyController.getMy() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }
