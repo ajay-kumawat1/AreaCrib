@@ -116,8 +116,10 @@ export default class PropertyController {
     next: NextFunction
   ): Promise<void> {
     try {
+      const propertyService = new PropertyService();
       const propertyId = req.params.id;
-      const property = await PropertyService.find({ _id: propertyId });
+
+      const property = await propertyService.findOne({ _id: propertyId });
       if (!property) {
         return sendResponse(
           res,
