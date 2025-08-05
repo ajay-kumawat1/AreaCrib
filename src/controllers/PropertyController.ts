@@ -142,4 +142,51 @@ export default class PropertyController {
       next(error);
     }
   }
+
+  public static async update(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const propertyService = new PropertyService();
+      const propertyId = req.params.id;
+
+      const property = await propertyService.findOne({ _id: propertyId });
+      if (!property) {
+        return sendResponse(
+          res,
+          {},
+          "Property not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      const updatedProperty = await PropertyService.updateById(
+        propertyId,
+        req.body
+      );
+      if (!updatedProperty) {
+        return sendResponse(
+          res,
+          {},
+          "Property update failed",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      return sendResponse(
+        res,
+        updatedProperty,
+        "Property updated successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`PropertyController.update() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }

@@ -25,6 +25,10 @@ export class PropertyRoutes extends RoutesConfig {
       .route(`${this.path}/:id`)
       .get(AuthAuthenticator.isAuthenticated(), PropertyController.getById);
 
+    this.app
+      .route(`${this.path}/:id`)
+      .put(AuthAuthenticator.isAuthenticated(), PropertyController.update);
+
     return this.app;
   }
 }

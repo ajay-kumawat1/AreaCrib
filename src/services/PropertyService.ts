@@ -1,4 +1,11 @@
-import { FilterQuery, ProjectionType, SortOrder } from "mongoose";
+import {
+  FilterQuery,
+  ObjectId,
+  ProjectionType,
+  QueryOptions,
+  SortOrder,
+  UpdateQuery,
+} from "mongoose";
 import { IPropertyDoc, NewPropertyDoc, Property } from "../models/Property";
 
 export class PropertyService {
@@ -56,5 +63,21 @@ export class PropertyService {
     projection?: ProjectionType<IPropertyDoc>
   ): Promise<IPropertyDoc | null> {
     return Property.findOne(query, projection);
+  }
+
+  /**
+   * Updates a user document by its ID.
+   *
+   * @param id - The ID of the user document to update.
+   * @param updateDoc - The update object to apply to the user document.
+   * @param options - The options object to specify additional update options.
+   * @returns A promise that resolves to the updated user document.
+   */
+  public static async updateById(
+    id: string | ObjectId,
+    updateDoc: UpdateQuery<IPropertyDoc>,
+    options?: QueryOptions<IPropertyDoc>
+  ): Promise<IPropertyDoc | null> {
+    return Property.findByIdAndUpdate(id, updateDoc, options);
   }
 }
