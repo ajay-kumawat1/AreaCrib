@@ -68,4 +68,35 @@ export default class PropertyController {
       next(error);
     }
   }
+
+  public static async getById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const propertyId = req.params.id;
+      const property = await PropertyService.find({ _id: propertyId });
+      if (!property) {
+        return sendResponse(
+          res,
+          {},
+          "Property not found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.NOT_FOUND
+        );
+      }
+
+      return sendResponse(
+        res,
+        property,
+        "Property fetched successfully",
+        RESPONSE_FAILURE,
+        RESPONSE_CODE.SUCCESS
+      );
+    } catch (error) {
+      logger.error(`PropertyController.getById() -> Error: ${error}`);
+      next(error);
+    }
+  }
 }

@@ -1,5 +1,4 @@
 import { FilterQuery, ProjectionType, SortOrder } from "mongoose";
-import { IUserDoc, User } from "../models/User";
 import { IPropertyDoc, Property } from "../models/Property";
 
 export class PropertyService {
