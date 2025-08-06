@@ -14,6 +14,7 @@ interface IProperty {
   amenities: string[];
   images: string[];
   description: string;
+  isDeleted?: boolean;
 }
 
 export interface IPropertyDoc extends IProperty, Document {}
@@ -41,6 +42,7 @@ const propertySchema = new Schema<IPropertyDoc>(
     amenities: { type: [String], required: true },
     images: { type: [String], required: true },
     description: { type: String, required: true },
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,

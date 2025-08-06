@@ -177,6 +177,10 @@ export default class PropertyController {
         );
       }
 
+      if (req.body.isDeleted) {
+        req.body.isDeleted = true;
+      }
+
       const updatedProperty = await PropertyService.updateById(
         propertyId,
         req.body
