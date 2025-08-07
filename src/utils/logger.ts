@@ -1,11 +1,11 @@
-import winston, { createLogger, format, transports } from "winston";
+import { createLogger, format, transports, Logform } from "winston";
 import config from "../config/config";
 
-const logFormats: winston.Logform.Format[] = [
+const logFormats: Logform.Format[] = [
   format.colorize(),
   format.timestamp({ format: "YYYY-MM-DD hh:mm:ss A" }),
   format.align(),
-  format.printf((info: { [x: string]: any; timestamp: any; level: any; message: any; }) => {
+  format.printf((info: Logform.TransformableInfo) => {
     const { timestamp: _timestamp, level, message, ...args } = info;
     return `{"level": "${level}", "message": "${message}", "data":  ${
       Object.keys(args).length ? JSON.stringify({ ...args }) : ""
