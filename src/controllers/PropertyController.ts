@@ -6,6 +6,7 @@ import {
   RESPONSE_CODE,
   RESPONSE_FAILURE,
 } from "../common/interfaces/Constants";
+import PropertyFactory from "../factories/PropertyFactory";
 
 export default class PropertyController {
   public static async create(
@@ -35,7 +36,9 @@ export default class PropertyController {
         createdBy: req.user?.id,
       };
 
-      const newProperty = await propertyService.create(req.body);
+      const newProperty = await propertyService.create(
+        PropertyFactory.generateProperty(req.body)
+      );
       return sendResponse(
         res,
         newProperty,

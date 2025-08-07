@@ -10,7 +10,6 @@ import {
 } from "../common/interfaces/Constants";
 import { sendEmail } from "../utils/sendMail";
 import UserManager from "../managers/UserManager";
-import { ObjectId } from "mongoose";
 import { UserService } from "../services/UserService";
 import UserFactory from "../factories/UserFactory";
 import { logger } from "../utils/logger";
@@ -289,17 +288,28 @@ export default class AuthController {
   public static async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const authHeader = req.headers.authorization;
-      if(!authHeader) {
-        sendResponse(res, {}, "No token found", RESPONSE_FAILURE, RESPONSE_CODE.BAD_REQUEST);
+      if (!authHeader) {
+        sendResponse(
+          res,
+          {},
+          "No token found",
+          RESPONSE_FAILURE,
+          RESPONSE_CODE.BAD_REQUEST
+        );
       }
 
-      const token = authHeader?.split('')[1];
+      const token = authHeader?.split("")[1];
       await redisClient.set(`blacklist_${token}`, `1`, {
-        EX: 60*60
-      })
+        EX: 60 * 60,
+      });
 
-      sendResponse(res, {}, "Logged out successfully", RESPONSE_SUCCESS, RESPONSE_CODE.SUCCESS)
-
+      sendResponse(
+        res,
+        {},
+        "Logged out successfully",
+        RESPONSE_SUCCESS,
+        RESPONSE_CODE.SUCCESS
+      );
     } catch (error) {
       logger.error(`AuthController.logout() -> Error: ${error}`);
       next(error);
