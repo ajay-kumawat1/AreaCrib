@@ -1,4 +1,10 @@
-import express, { Application, json, urlencoded, Request, Response } from "express";
+import express, {
+  Application,
+  json,
+  urlencoded,
+  Request,
+  Response,
+} from "express";
 import connectDB from "./config/database";
 import config from "./config/config";
 import cors from "cors";
@@ -22,7 +28,7 @@ app.get("/", (_req: Request, res: Response) => {
   res.send("Server is running");
 });
 
-app.use('/', new IndexRoute(app).router);
+app.use("/", new IndexRoute(app).router);
 
 app.listen(PORT, (err?: Error) => {
   err

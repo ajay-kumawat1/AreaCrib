@@ -1,12 +1,12 @@
-import { createClient } from "redis";
-import { logger } from "../utils/logger";
+// import { createClient } from "redis";
+// import { logger } from "../utils/logger";
 
-const redisClient = createClient();
+// const redisClient = createClient();
 
-redisClient.on('error', (err) => {
-    logger.error("Redis Connection Error", err)
-})
+// redisClient.on('error', (err) => {
+//     logger.error("Redis Connection Error", err)
+// })
 
-redisClient.connect();
+// redisClient.connect();
 
-export default redisClient;
+// export default redisClient;

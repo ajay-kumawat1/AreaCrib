@@ -13,7 +13,7 @@ import UserManager from "../managers/UserManager";
 import { UserService } from "../services/UserService";
 import UserFactory from "../factories/UserFactory";
 import { logger } from "../utils/logger";
-import redisClient from "../common/redisClient";
+// import redisClient from "../common/redisClient";
 import { getResetPasswordEmail } from "../template/resetPasswordEmail";
 
 export default class AuthController {
@@ -285,10 +285,10 @@ export default class AuthController {
         );
       }
 
-      const token = authHeader?.split("")[1];
-      await redisClient.set(`blacklist_${token}`, `1`, {
-        EX: 60 * 60,
-      });
+      // const token = authHeader?.split("")[1];
+      // await redisClient.set(`blacklist_${token}`, `1`, {
+      //   EX: 60 * 60,
+      // });
 
       sendResponse(
         res,
