@@ -2,7 +2,6 @@ import { connect } from "mongoose";
 import config from "./config";
 
 const opts = {
-  useNewUrlParser: true,
   serverSelectionTimeoutMS: 10000,
   autoIndex: config.mongo.autoIndex,
   autoCreate: config.mongo.useCreateIndex,
